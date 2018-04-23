@@ -1,0 +1,66 @@
+---
+title: "ACS data manipulation"
+author: "Kevin Hunt"
+date: "April 23, 2018"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(geojsonio)
+library(rgdal)
+library(downloader)
+library(leaflet)
+```
+
+## R Markdown
+
+```{r}
+pop.estimates <- read.csv("nst-est2017-popchg2010_2017.csv", stringsAsFactors = FALSE)
+pop.change <- pop.estimates[c("STATE", "NAME", "POPESTIMATE2010", "POPESTIMATE2017")]
+pop.change$difference = pop.change$POPESTIMATE2017 - pop.change$POPESTIMATE2010
+pop.change$percentagegrowth = pop.change$POPESTIMATE2017 / pop.change$POPESTIMATE2010
+head(pop.change)
+min(pop.change$percentagegrowth)
+max(pop.change$percentagegrowth)
+```
+
+With our data loaded, we are ready to begin with the visualization.
+We’ll start by loading the data from JSON. In this case, we’ll use the geojsonio package to load the data into sp objects, which will let us easily manipulate the geographic features, and their properties, in R.
+```{r}
+u <- "eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_500k.json"
+downloader::download(url = u, destfile="us-states.geojson")
+states <- geojsonio::geojson_read("us-states.geojson", what= "sp")
+class(states)
+names(states)
+```
+
+```{r}
+m <- leaflet(states) %>%
+  setView(-96, 37.8, 4) %>%
+  addProviderTiles(providers$CartoDB.Positron)
+
+m %>% addPolygons()
+```
+
+```{r}
+bins <- c(.89, .95, 1.0, 1.05, 1.10, 1.15)
+pal <- colorBin("YlOrRd", domain = pop.change$percentagegrowth, bins = bins)
+
+m %>% addPolygons(
+  fillColor = ~pal(pop.change$percentagegrowth),
+  weight = 2,
+  opacity = 1,
+  color = "white",
+  dashArray = "3",
+  fillOpacity = 0.7)
+```
+
+
+
+
+
+
+
+
