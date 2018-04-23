@@ -12,6 +12,7 @@ library(geojsonio)
 library(rgdal)
 library(downloader)
 library(leaflet)
+library(maptools)
 ```
 
 ## R Markdown
@@ -21,9 +22,11 @@ pop.estimates <- read.csv("nst-est2017-popchg2010_2017.csv", stringsAsFactors = 
 pop.change <- pop.estimates[c("STATE", "NAME", "POPESTIMATE2010", "POPESTIMATE2017")]
 pop.change$difference = pop.change$POPESTIMATE2017 - pop.change$POPESTIMATE2010
 pop.change$percentagegrowth = pop.change$POPESTIMATE2017 / pop.change$POPESTIMATE2010
+pop.change <- pop.change[!(pop.change$STATE == 0),]
 head(pop.change)
 min(pop.change$percentagegrowth)
 max(pop.change$percentagegrowth)
+arrange(pop.change, desc(percentagegrowth))
 ```
 
 With our data loaded, we are ready to begin with the visualization.
@@ -31,19 +34,27 @@ We’ll start by loading the data from JSON. In this case, we’ll use the geojs
 ```{r}
 u <- "eric.clst.org/assets/wiki/uploads/Stuff/gz_2010_us_040_00_500k.json"
 downloader::download(url = u, destfile="us-states.geojson")
+
 states <- geojsonio::geojson_read("us-states.geojson", what= "sp")
 class(states)
 names(states)
+head(states)
+min(states@data$CENSUSAREA)
+max(states@data$CENSUSAREA)
 ```
 
 ```{r}
-states@data <- merge(states@data, pop.change, by=intersect(names(states@data), names(pop.change)))
+head(pop.change$NAME)
+head(as.character(states@data$NAME))
+pop.change <- pop.change[order(match(pop.change$NAME, states@data$NAME)),]
+states@data$percentagegrowth <- pop.change[, "percentagegrowth"]
 ```
 
 ```{r}
 m <- leaflet(states) %>%
   setView(-96, 37.8, 4) %>%
-  addProviderTiles(providers$CartoDB.Positron)
+  #addTiles()
+  addProviderTiles("Stamen.Watercolor")
 
 m %>% addPolygons()
 ```
@@ -59,23 +70,6 @@ m %>% addPolygons(
   color = "white",
   dashArray = "3",
   fillOpacity = 0.7)
-```
-```{r}
-m %>% addPolygons(
-  fillColor = ~pal(states$percentagegrowth),
-  weight = 2,
-  opacity = 1,
-  color = "white",
-  dashArray = "3",
-  fillOpacity = 0.7,
-  highlight = highlightOptions(
-    weight = 5,
-    color = "#666",
-    dashArray = "",
-    fillOpacity = 0.7,
-    bringToFront = TRUE
-  )
-)
 ```
 
 ```{r}
@@ -97,14 +91,43 @@ m %>% addPolygons(
     dashArray = "",
     fillOpacity = 0.7,
     bringToFront = TRUE
+  )
+)
+```
+
+```{r}
+labels <- sprintf(
+  "<strong>%s</strong><br/>%g Percent",
+  states$NAME, states$percentagegrowth
+) %>% lapply(htmltools::HTML)
+
+m <- m %>% addPolygons(
+  fillColor = ~pal(states$percentagegrowth),
+  weight = 2,
+  opacity = 1,
+  color = "white",
+  dashArray = "3",
+  fillOpacity = 0.7,
+  highlight = highlightOptions(
+    weight = 5,
+    color = "#666",
+    dashArray = "",
+    fillOpacity = 0.7,
+    bringToFront = TRUE
   ),
   label = labels,
   labelOptions = labelOptions(
     style = list("font-weight" = "normal", padding = "3px 8px"),
-    textsize = "15px",
+    testsize = "15px",
     direction = "auto"
   )
 )
+m
+```
+
+
+```{r}
+m %>% addLegend(pal = pal, values = ~states$percentagegrowth, opacity = 0.7, title="Percent Growth Since 2010", position = "bottomright")
 ```
 
 
