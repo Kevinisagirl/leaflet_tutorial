@@ -95,14 +95,11 @@ It seems like we just ruined a perfectly good watercolor. This needs some data t
 
 ## Color by some feature in the SpatialPolygonsDataFrame.
 
-We now want to color by a feautre of our data, the percentage of growth from 2010 to 2017 in each state. First, we need to create our color scale for this data. We can do this manually by inspecting the range of our data.
-```{r}
-hist(pop.change$percentagegrowth)
-```
+We now want to color by a feautre of our data, the percentage of growth from 2010 to 2017 in each state. First, we need to create our color scale for this data. Let's split bin on populations that have decreased and increased
 
 We will now create bins based on this range and use those bins to divide a colorscale up.
 ```{r}
-bins <- c(.85, 1.0, 1.15)
+bins <- c(0, 1.0, Inf)
 pal <- colorBin("YlOrRd", domain = states$percentagegrowth, bins = bins)
 ```
 
@@ -158,7 +155,7 @@ hovering <-m %>% addPolygons(
                     bringToFront = TRUE
   )
 )
-hovering
+hovering %>% addLegend(pal = pal, values = ~states$percentagegrowth, opacity = 0.7, title="Population Growth Since 2010", position = "bottomright")
 ```
 
 __Lab Exercise 3: Wow that hover border is gross looking. Please fix it__
