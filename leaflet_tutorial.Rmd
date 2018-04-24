@@ -7,14 +7,18 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-library(dplyr)
-library(geojsonio)
-library(downloader)
-library(leaflet)
-library(maptools)
+library(install.load)
+install_load('dplyr')
+
+install_load('geojsonio')
+
+install_load('downloader')
+install_load('leaflet')
+install_load('maptools')
 ```
 
 This tutorial is based partially on the tutorial:
+http://rstudio.github.io/leaflet/choropleths.html
 
 ## Load our interesting Data
 
