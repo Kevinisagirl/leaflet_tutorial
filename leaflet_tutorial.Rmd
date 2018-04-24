@@ -33,7 +33,7 @@ pop.change <- pop.estimates[c("STATE", "NAME", "POPESTIMATE2010", "POPESTIMATE20
 pop.change$difference = pop.change$POPESTIMATE2017 - pop.change$POPESTIMATE2010
 pop.change$percentagegrowth = pop.change$POPESTIMATE2017 / pop.change$POPESTIMATE2010
 # drop the information for overall United States and Regions (we only want states)
-pop.change <- pop.change[!(pop.change$STATE == 0),]
+pop.change <- pop.change %>% filter(STATE != 0) 
 
 head(pop.change)
 ```
@@ -51,7 +51,7 @@ downloader::download(url = u, destfile="us-states.geojson")
 # use geojsonio to load the spatial data into sp objects
 states <- geojsonio::geojson_read("us-states.geojson", what= "sp")
 #class(states)
-#names(states)
+names(states)
 #str(states)
 ```
 
@@ -64,13 +64,17 @@ head(as.character(states@data$NAME))
 ```
 
 The dataframe containing Census Data is organized with the states in alphabetical order, whereas the SpatialPolygonsDataFrame is in another order.
-WARNING* there is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! R will happily merge these dataframes in a completely crazy order and not throw an error leading to plotting of the wrong data for each state! 
+
+**WARNING:** There is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! R will happily merge these dataframes in a completely crazy order and not throw an error leading to plotting of the wrong data for each state! 
 ```{r}
 # Reorder the data to match the order of the SpatialPolygonsDataFrame
-pop.change <- pop.change[order(match(pop.change$NAME, states@data$NAME)),]
+#pop.change <- pop.change[order(match(pop.change$NAME, states@data$NAME)),]
 
 # Add a new column to the SpatialPolygonsDataFrame@data with our data of interest
-states@data$percentagegrowth <- pop.change[, "percentagegrowth"]
+#states@data$percentagegrowthOLD <- pop.change$percentagegrowth
+
+
+states@data <- merge(states@data, pop.change %>% select(NAME, percentagegrowth), by = "NAME")
 ```
 
 ## Our First Leaflet

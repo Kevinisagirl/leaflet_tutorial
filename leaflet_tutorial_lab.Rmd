@@ -74,7 +74,7 @@ Let's take a look at the order of the states in the two data frames. What do you
 
 ```
 
-WARNING* there is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! R will happily merge these dataframes in a completely crazy order and not throw an error leading to plotting of the wrong data for each state! 
+**WARNING:** There is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! R will happily merge these dataframes in a completely crazy order and not throw an error leading to plotting of the wrong data for each state! 
 ```{r}
 # Reorder the census data to match the order of the states in the SpatialPolygonsDataFrame
 
