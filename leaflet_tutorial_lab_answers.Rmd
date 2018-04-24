@@ -192,7 +192,14 @@ pal <- colorBin("YlOrRd", domain = states$percentagegrowth, bins = bins)
 
 leaflet(states) %>%
     setView(-96, 37.8, 4) %>% # set the view to the contiguous United States
-    addProviderTiles(providers$Esri.NatGeoWorldMap) %>%  # set what the background map should look like.
+    #addProviderTiles(providers$Esri.NatGeoWorldMap) %>%  # set what the background map should look like.
+    addTiles() %>% 
+    addWMSTiles(
+        "http://mesonet.agron.iastate.edu/cgi-bin/wms/nexrad/n0r.cgi",
+        layers = "nexrad-n0r-900913",
+        options = WMSTileOptions(format = "image/png", transparent = TRUE),
+        attribution = "Weather data © 2012 IEM Nexrad"
+    ) %>% 
     addPolygons(
         fillColor = ~pal(states$percentagegrowth),
         weight = 2,
