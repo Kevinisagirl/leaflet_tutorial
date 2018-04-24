@@ -65,16 +65,19 @@ head(as.character(states@data$NAME))
 
 The dataframe containing Census Data is organized with the states in alphabetical order, whereas the SpatialPolygonsDataFrame is in another order.
 
-**WARNING:** There is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! R will happily merge these dataframes in a completely crazy order and not throw an error leading to plotting of the wrong data for each state!
+**WARNING:** There is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! The states@data data frame needs to be in the same order as the JSON data. R will happily merge dataframes in a new order, leading to plotting of the wrong data for each state! 
+
+Hint: Look at the options in merge.
+
 ```{r}
 # Reorder the data to match the order of the SpatialPolygonsDataFrame
-pop.change <- pop.change[order(match(pop.change$NAME, states@data$NAME)),]
+#pop.change <- pop.change[order(match(pop.change$NAME, states@data$NAME)),]
 
 # Add a new column to the SpatialPolygonsDataFrame@data with our data of interest
-states@data$percentagegrowth <- pop.change$percentagegrowth
+#states@data$percentagegrowth <- pop.change$percentagegrowth
 
 # Add a new column to the SpatialPolygonsDataFrame@data with our data of interest
-#states@data <- merge(states@data, pop.change %>% select(NAME, percentagegrowth), by = "NAME")
+states@data <- merge(states@data, pop.change %>% select(NAME, percentagegrowth), by = "NAME", sort = FALSE)
 ```
 
 ## Our First Leaflet
@@ -258,8 +261,8 @@ m %>%
         fillOpacity = 0.7,
         highlight = highlightOptions(
             weight = 3,
-            color = "#666",
-            dashArray = "-",
+            color = "black",
+            dashArray = "",
             #fillOpacity = 0.7,
             bringToFront = TRUE)
     ) %>% 
