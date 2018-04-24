@@ -76,8 +76,6 @@ Let's take a look at the order of the states in the two data frames. What do you
 
 **WARNING:** There is much misleading information online about how to merge a dataset with your SpatialPolygonsDataFrame. Be careful! R will happily merge these dataframes in a completely crazy order and not throw an error leading to plotting of the wrong data for each state! 
 ```{r}
-# Reorder the census data to match the order of the states in the SpatialPolygonsDataFrame
-
 # Add a new column to the SpatialPolygonsDataFrame@data with our data of interest
 
 ```
@@ -115,7 +113,8 @@ pal <- colorBin("YlOrRd", domain = "column to color by", bins = bins)
 
 Now, using the feature data we will color the polygons and add a nice border.
 ```{r}
-withcolor <- m %>% addPolygons(
+withcolor <- m %>% 
+  addPolygons(
         
   
           #Enter Code Here
@@ -146,7 +145,8 @@ First, we're going to create a response to hovering over the polygons.
 ```{r}
 labels <- 
 
-hovering <-m %>% addPolygons(
+hovering <-m %>% 
+  addPolygons(
                   
   # Add code here
 
@@ -160,7 +160,8 @@ Finally, we are going to create a popup to provide information while hovering.
 ```{r}
 labels <- 
 
-final <- m %>% addPolygons(
+final <- m %>% 
+  addPolygons(
   # Add code here
 )
 final %>% # what's missing again?
