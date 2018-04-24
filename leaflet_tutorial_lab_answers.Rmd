@@ -114,7 +114,7 @@ pal <- colorBin("YlOrRd", domain = states$percentagegrowth, bins = bins)
 Now, using the feature data we will color the polygons.
 ```{r}
 withcolor <- m %>% 
-  addPolygons(
+    addPolygons(
         fillColor = ~pal(states$percentagegrowth),
         weight = 2,
         opacity = 0.5,
@@ -129,7 +129,13 @@ It's a choropleth. But wait! What do all those colors mean?
 # Add a legend
 
 ```{r}
-withcolor %>% addLegend(pal = pal, values = ~states$percentagegrowth, opacity = 0.7, title="Population Growth Since 2010", position = "bottomright")
+withcolor %>% 
+    addLegend(
+        pal = pal, 
+        values = ~states$percentagegrowth, 
+        opacity = 0.7, 
+        title="Population Growth Since 2010", 
+        position = "bottomright")
 ```
 
 Better as far as responsible reporting goes. We can quickly see which states had a population decrease in 2017 from 2010. However, this seems to be a waste of the visual space. We could have simply listed states that saw a decrease in population and not used up so much of the page. Let's make this map more informative. It would be interesting to see differences in the percent increase, 15% population increase in 7 years is quite different than 0.08% increase.
@@ -140,23 +146,68 @@ __Lab Exercise 1: Play with the binning to make the map more informative.__
 bins <- c(0, seq(1, 1.15, 0.03), Inf)
 pal <- colorBin("YlOrRd", domain = states$percentagegrowth, bins = bins)
 
-withcolor <- m %>% 
-  addPolygons(
+m %>% 
+    addPolygons(
         fillColor = ~pal(states$percentagegrowth),
         weight = 2,
         opacity = 0.5,
         color = "white",
         dashArray = "3",
         fillOpacity = 0.7) %>% 
-  addLegend(pal = pal, values = ~states$percentagegrowth, opacity = 0.7, title="Population Growth Since 2010", position = "bottomright")
-withcolor
+    addLegend(
+        pal = pal, 
+        values = ~states$percentagegrowth, 
+        opacity = 0.7, 
+        title="Population Growth Since 2010", 
+        position = "bottomright")
 ```
 
 __Lab Exercise 2: Aesthetics: Improve the legend, change the color scheme.__
 
+```{r}
+bins <- c(0, seq(1, 1.15, 0.03), Inf)
+pal <- colorBin("Greens", domain = states$percentagegrowth, bins = bins)
 
+m %>% 
+    addPolygons(
+        fillColor = ~pal(states$percentagegrowth),
+        weight = 2,
+        opacity = 0.5,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.7) %>% 
+    addLegend(
+        pal = pal, 
+        values = ~states$percentagegrowth, 
+        opacity = 0.7, 
+        title="Population Growth Since 2010", 
+        position = "bottomright", 
+        labFormat = labelFormat(suffix = "%"))
+```
 
 __Advanced: Find a different provider tile for the background and change the aesthetics to match__
+
+```{r}
+pal <- colorBin("YlOrRd", domain = states$percentagegrowth, bins = bins)
+
+leaflet(states) %>%
+    setView(-96, 37.8, 4) %>% # set the view to the contiguous United States
+    addProviderTiles(providers$Esri.NatGeoWorldMap) %>%  # set what the background map should look like.
+    addPolygons(
+        fillColor = ~pal(states$percentagegrowth),
+        weight = 2,
+        opacity = 0.5,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.7) %>% 
+    addLegend(
+        pal = pal, 
+        values = ~states$percentagegrowth, 
+        opacity = 0.7, 
+        title="Population Growth Since 2010",
+        position = "bottomright", 
+        labFormat = labelFormat(suffix = "%"))
+```
 
 ## Adding Interactivity
 
@@ -164,60 +215,91 @@ Now what this map needs is some interactivity. It's 2018, you can't have a visua
 
 First, we're going to create a response to hovering over the polygons.
 ```{r}
-labels <- sprintf(
-  "<strong>%s</strong><br/>%g",
-  states$NAME, states$percentagegrowth
-) %>% lapply(htmltools::HTML)
-
-hovering <-m %>% addPolygons(
-                  fillColor = ~pal(states$percentagegrowth),
-                  weight = 2,
-                  opacity = 1,
-                  color = "white",
-                  dashArray = "3",
-                  fillOpacity = 0.7,
-                  highlight = highlightOptions(
-                    weight = 5,
-                    color = "#666",
-                    dashArray = "",
-                    fillOpacity = 0.7,
-                    bringToFront = TRUE
-  )
-)
-hovering %>% addLegend(pal = pal, values = ~states$percentagegrowth, opacity = 0.7, title="Population Growth Since 2010", position = "bottomright")
+m %>% 
+    addPolygons(
+        fillColor = ~pal(states$percentagegrowth),
+        weight = 2,
+        opacity = 1,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.7,
+        highlight = highlightOptions(
+            weight = 5,
+            color = "#666",
+            dashArray = "",
+            fillOpacity = 0.7,
+            bringToFront = TRUE)
+    ) %>% 
+    addLegend(
+        pal = pal, 
+        values = ~states$percentagegrowth, 
+        opacity = 0.7, 
+        title="Population Growth Since 2010", 
+        position = "bottomright")
 ```
 
 __Lab Exercise 3: Wow that hover border is gross looking. Please fix it__
 
+```{r}
+m %>% 
+    addPolygons(
+        fillColor = ~pal(states$percentagegrowth),
+        weight = 2,
+        opacity = 1,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.7,
+        highlight = highlightOptions(
+            weight = 3,
+            color = "#666",
+            dashArray = "-",
+            #fillOpacity = 0.7,
+            bringToFront = TRUE)
+    ) %>% 
+    addLegend(
+        pal = pal, 
+        values = ~states$percentagegrowth, 
+        opacity = 0.7, 
+        title="Population Growth Since 2010", 
+        position = "bottomright")
+```
+
 Finally, we are going to create a popup to provide information while hovering.
+
 ```{r}
 labels <- sprintf(
-  "<strong>%s</strong><br/>%g Percent",
+  "<strong>%s</strong><br/>%g%%",
   states$NAME, states$percentagegrowth
 ) %>% lapply(htmltools::HTML)
 
-final <- m %>% addPolygons(
-  fillColor = ~pal(states$percentagegrowth),
-  weight = 2,
-  opacity = 1,
-  color = "white",
-  dashArray = "3",
-  fillOpacity = 0.7,
-  highlight = highlightOptions(
-    weight = 5,
-    color = "#666",
-    dashArray = "",
-    fillOpacity = 0.7,
-    bringToFront = TRUE
-  ),
-  label = labels,
-  labelOptions = labelOptions(
-    style = list("font-weight" = "normal", padding = "3px 8px"),
-    testsize = "15px",
-    direction = "auto"
-  )
-)
-final %>% addLegend(pal = pal, values = ~states$percentagegrowth, opacity = 0.7, title="Population Growth Since 2010", position = "bottomright")
+m %>% 
+    addPolygons(
+        fillColor = ~pal(states$percentagegrowth),
+        weight = 2,
+        opacity = 1,
+        color = "white",
+        dashArray = "3",
+        fillOpacity = 0.7,
+        highlight = highlightOptions(
+          weight = 5,
+          color = "#666",
+          dashArray = "",
+          fillOpacity = 0.7,
+          bringToFront = TRUE
+        ),
+        label = labels,
+        labelOptions = labelOptions(
+          style = list("font-weight" = "normal", padding = "3px 8px"),
+          testsize = "15px",
+          direction = "auto"
+        )
+    ) %>% 
+    addLegend(
+      pal = pal, 
+      values = ~states$percentagegrowth,
+      opacity = 0.7, 
+      title="Population Growth Since 2010", 
+      position = "bottomright")
 ```
 
 Note* Formating the labelOptions doesn't work for me.
@@ -225,8 +307,24 @@ And we've done it! An interactive choropleth!
 Now, does it make sense to use the percent increase? Will we see anything different if we use raw numbers? We originally created a column for the difference in population from 2017 to 2010.
 
 __Lab Exercise 4: Swap the data to the raw difference in population__
+
+```{r}
+
+```
+
 __Lab Exercise 5: If you haven't already, change the aesthetics of the map__
+
+```{r}
+
+```
+
 __Advanced: Find a dataset at the county level (optional: of Florida). Find a geoJSON with county level information. Use Leaflet to create an interactive map.__
+
+```{r}
+
+```
+
+
 __Challenge: Feeling like your map is looking pretty good? Enter your map to be evaluated by your peers at the end of class for a chance to win a prize.__
 
 

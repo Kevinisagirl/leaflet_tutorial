@@ -134,8 +134,22 @@ withcolor %>%
 Better as far as responsible reporting goes. We can quickly see which states had a population decrease in 2017 from 2010. However, this seems to be a waste of the visual space. We could have simply listed states that saw a decrease in population and not used up so much of the page. Let's make this map more informative. It would be interesting to see differences in the percent increase, 15% population increase in 7 years is quite different than 0.08% increase.
 
 __Lab Exercise 1: Play with the binning to make the map more informative.__
+
+```{r}
+
+```
+
 __Lab Exercise 2: Aesthetics: Improve the legend, change the color scheme.__
+
+```{r}
+
+```
+
 __Advanced: Find a different provider tile for the background and change the aesthetics to match__
+
+```{r}
+
+```
 
 ## Adding Interactivity
 
@@ -156,7 +170,12 @@ hovering %>% # what about the legend?
 
 __Lab Exercise 3: Wow that hover border is gross looking. Please fix it__
 
+```{r}
+
+```
+
 Finally, we are going to create a popup to provide information while hovering.
+
 ```{r}
 labels <- 
 
@@ -168,12 +187,29 @@ final %>% # what's missing again?
 ```
 
 Note* Formating the labelOptions doesn't work for me.
+
 And we've done it! An interactive choropleth!
+
 Now, does it make sense to use the percent increase? Will we see anything different if we use raw numbers? We originally created a column for the difference in population from 2017 to 2010.
 
 __Lab Exercise 4: Swap the data to the raw difference in population__
+
+```{r}
+
+```
+
 __Lab Exercise 5: If you haven't already, change the aesthetics of the map__
+
+```{r}
+
+```
+
 __Advanced: Find a dataset at the county level (optional: of Florida). Find a geoJSON with county level information. Use Leaflet to create an interactive map.__
+
+```{r}
+
+```
+
 __Challenge: Feeling like your map is looking pretty good? Enter your map to be evaluated by your peers at the end of class for a chance to win a prize.__
 
 
